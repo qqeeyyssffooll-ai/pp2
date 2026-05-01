@@ -1,7 +1,6 @@
 import math
 import pygame
 
-# NEW: upgraded paint with extra shapes and live shape preview
 def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 560))
@@ -13,7 +12,6 @@ def main():
     drawings = []
     current_stroke = None
     shape_start = None
-    # NEW: stores current mouse position for live preview while dragging shapes
     current_mouse_pos = None
     drawing = False
     
@@ -26,7 +24,6 @@ def main():
         
         for event in pygame.event.get():
             
-            # determin if X was clicked, or Ctrl+W or Alt+F4 was used
             if event.type == pygame.QUIT:
                 return
             if event.type == pygame.KEYDOWN:
@@ -37,7 +34,6 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     return
              
-                # determine if a letter key was pressed
                 if event.key == pygame.K_r:
                     color_mode = 'red'
                 elif event.key == pygame.K_g:
@@ -52,7 +48,6 @@ def main():
                     tool = 'circle'
                 elif event.key == pygame.K_t:
                     tool = 'rectangle'
-                # NEW: extra shape hotkeys
                 elif event.key == pygame.K_s:
                     tool = 'square'
                 elif event.key == pygame.K_d:
@@ -69,10 +64,8 @@ def main():
                 elif event.key == pygame.K_DOWN:
                     radius = max(1, radius - 1)
 
-             
-            
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left mouse button
+                if event.button == 1:
                     current_mouse_pos = event.pos
                     if tool == 'brush' or tool == 'eraser':
                         current_stroke = {
@@ -115,7 +108,6 @@ def main():
             else:
                 draw_shape(screen, drawing_item)
 
-        # NEW: preview shape before mouse button is released
         if drawing and shape_start is not None and current_mouse_pos is not None:
             draw_shape(screen, {
                 "type": tool,
@@ -192,7 +184,6 @@ def get_rect(start, end):
     height = abs(start[1] - end[1])
     return pygame.Rect(left, top, width, height)
 
-# NEW: helper for perfect square
 def get_square_rect(start, end):
     dx = end[0] - start[0]
     dy = end[1] - start[1]
@@ -202,7 +193,6 @@ def get_square_rect(start, end):
     top = start[1] if dy >= 0 else start[1] - side
     return pygame.Rect(left, top, side, side)
 
-# NEW: helper for diamond points
 def get_diamond_points(start, end):
     rect = get_rect(start, end)
     center_x = rect.left + rect.width // 2
@@ -214,7 +204,6 @@ def get_diamond_points(start, end):
         (rect.left, center_y),
     ]
 
-# NEW: helper for right triangle points
 def get_right_triangle_points(start, end):
     rect = get_rect(start, end)
     return [
@@ -223,7 +212,6 @@ def get_right_triangle_points(start, end):
         (rect.right, rect.bottom),
     ]
 
-# NEW: helper for equilateral triangle points
 def get_equilateral_triangle_points(start, end):
     rect = get_rect(start, end)
     side = min(rect.width, int((2 * rect.height) / math.sqrt(3)))
@@ -250,7 +238,6 @@ def draw_shape(screen, shape):
     if shape["type"] == "rectangle":
         rect = get_rect(start, end)
         pygame.draw.rect(screen, color, rect, width)
-    # NEW: square, diamond, right triangle and equilateral triangle
     elif shape["type"] == "square":
         rect = get_square_rect(start, end)
         if rect.width > 0:
@@ -290,7 +277,6 @@ def draw_ui(screen, tool, color_mode, radius):
     screen.blit(size_surface, (18, 65))
     pygame.draw.rect(screen, active_color, pygame.Rect(120, 42, 18, 18))
 
-    # NEW: updated help panel with new shape shortcuts
     hints = [
         "P brush  E eraser  O circle  T rectangle  S square",
         "D diamond  Y right triangle  U equilateral triangle",
